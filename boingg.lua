@@ -56,7 +56,7 @@ local function update_cycle(x, stage)
   local a = (stage-1) % (16-2*h) + 1
   cycles[x].led_pos = (a <= (9-h) and 1 or 0) * (a + h - 1) + (a > (9-h) and 1 or 0) * (17 - a - h)
   local on = cycles[x].led_pos == 8
-  if on then
+  if on and math.random(100) <= params:get("probability") then
     engine.start(x, midicps(notes[x] + params:get("transpose")))
     if params:get("ii") == 2 then
       crow.ii.jf.play_note(((notes[x] + params:get("transpose")) - 60) / 12, 5)
@@ -109,6 +109,7 @@ function init()
   params:add_option("ii", "ii", ii_options, 1)
   params:set_action("ii", function() crow.ii.pullup(true) crow.ii.jf.mode(1) end)
 
+  params:add_number("probability", "probability", 0, 100, 100)
   params:add_separator()
 
   params:add_control("legato", "legato", controlspec.new(0, 3, "lin", 0, 0.1, "s"))
