@@ -25,6 +25,7 @@
 -- originally by declutter
 --
 -- updated for 2.0 by justmat
+-- llllllll.co/t/26536
 
 engine.name = 'PolySub'
 
