@@ -36,7 +36,7 @@ local DURATION_1 = 1 / 20
 local GRID_FRAMERATE = 1 / 60
 local SCREEN_FRAMERATE = 1 / 30
 
-local ii_options = {"off", "ii jf"}
+local output_options = {"audio", "ii jf"}
 local notes = { 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26, 28 }
 --- update with mark_eats scales
 local cycles = {}
@@ -47,9 +47,11 @@ local transpose = 48
 local grid_refresh_metro
 local screen_refresh_metro
 
+
 local function midicps(m)
   return (440 / 32) * math.pow(2, (m - 9) / 12)
 end
+
 
 local function draw_cycle(x, stage)
   if g then
@@ -59,6 +61,18 @@ local function draw_cycle(x, stage)
   end
 end
 
+
+local function set_output()
+  if params:get("output") == 2 then
+    crow.ii.pullup(true)
+    crow.ii.jf.mode(1)
+  else
+    crow.ii.pullup(false)
+    crow.ii.jf.mode(0)
+  end
+end
+
+
 local function update_cycle(x, stage)
   ---set led.po
   local h = cycles[x].height
@@ -66,14 +80,16 @@ local function update_cycle(x, stage)
   cycles[x].led_pos = (a <= (9-h) and 1 or 0) * (a + h - 1) + (a > (9-h) and 1 or 0) * (17 - a - h)
   local on = cycles[x].led_pos == 8
   if on and math.random(100) <= params:get("probability") then
-    engine.start(x, midicps(notes[x] + params:get("transpose")))
-    if params:get("ii") == 2 then
+    if params:get("output") == 1 then
+      engine.start(x, midicps(notes[x] + params:get("transpose")))
+    elseif params:get("output") == 2 then
       crow.ii.jf.play_note(((notes[x] + params:get("transpose")) - 60) / 12, 5)
     end
   else
     engine.stop(x)
   end
 end
+
 
 local function start_cycle(x, speed)
   local timer = cycle_metros[x]
@@ -84,9 +100,9 @@ local function start_cycle(x, speed)
     update_cycle(x, stage)
     draw_cycle(x, stage)
   end
-
   cycles[x].running = true
 end
+
 
 local function stop_cycle(x)
   cycle_metros[x]:stop()
@@ -100,11 +116,15 @@ local function stop_cycle(x)
   engine.stop(x)
 end
 
+
 function init()
   for i=1, 16 do
     cycle_metros[i] = metro.init()
     cycles[i] = { running = false, keys_pressed = 0, speed = 1, led_pos = 0, height = 0}
   end
+
+  params:add_option("output", "output", output_options, 1)
+  params:set_action("output", function() set_output() end)
 
   params:add_number("tempo", "tempo", 10, 240, 40)
   params:set_action("tempo", function(t)
@@ -113,12 +133,10 @@ function init()
     end
   end)
 
-  params:add_number("transpose", "transpose", 0, 127, 48)
-  
-  params:add_option("ii", "ii", ii_options, 1)
-  params:set_action("ii", function() crow.ii.pullup(true) crow.ii.jf.mode(1) end)
-
   params:add_number("probability", "probability", 0, 100, 100)
+
+  params:add_number("transpose", "transpose", 0, 127, 48)
+
   params:add_separator()
 
   params:add_control("legato", "legato", controlspec.new(0, 3, "lin", 0, 0.1, "s"))
@@ -202,6 +220,7 @@ function g.key(x, y, s)
   end
 end
 
+
 function enc(n, d)
   if n == 1 then
     mix:delta("output", d)
@@ -215,6 +234,7 @@ function enc(n, d)
   end
 end
 
+
 function key(n, z)
   if z == 1 then
     if n == 2 then
@@ -224,6 +244,7 @@ function key(n, z)
     end
   end
 end
+
 
 function redraw()
   screen.clear()
