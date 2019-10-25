@@ -1,20 +1,29 @@
-
+--
 -- Boingg
 -- a bouncing ball app
+-- ----------
 --
--- Heavily based on flin 
--- by artfwo
+-- norns control
+--
+-- enc2 and enc3 adjust scales
+-- key2 starts a ball bouncing
+-- key3 stops ball from bouncing
+-- ----------
+--
+-- grid control
+--
 -- Press a grid key to 
 -- start a bouncing ball
 --
 -- press the bottom key
 -- to stop
 --
--- enc2 and enc3 adjust scales
--- key2 starts a ball bouncing
--- key3 stops ball from bouncing
+-- ----------
+-- Heavily based on flin 
+-- by artfwo
 --
 -- originally by declutter
+--
 -- updated for 2.0 by justmat
 
 engine.name = 'PolySub'
