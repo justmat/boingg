@@ -25,19 +25,23 @@
 -- originally by declutter
 --
 -- updated for 2.0 by justmat
--- llllllll.co/t/26536
 
 engine.name = 'PolySub'
+
+local m = midi.connect(1)
+m.event = function() end
 
 local g = grid.connect(1)
 function g.event(x,y,z) gridkey(x,y,z) end
 
-local GRID_HEIGHT = 8
+local active_notes = {}
+
+local GRID_HEIGHT = 16
 local DURATION_1 = 1 / 20
 local GRID_FRAMERATE = 1 / 60
 local SCREEN_FRAMERATE = 1 / 30
 
-local output_options = {"audio", "ii jf"}
+local output_options = {"audio", "ii jf", "midi"}
 local notes = { 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26, 28 }
 --- update with mark_eats scales
 local cycles = {}
@@ -47,6 +51,14 @@ local transpose = 48
 
 local grid_refresh_metro
 local screen_refresh_metro
+
+
+local function all_notes_off()
+  for _, a in pairs(active_notes) do
+     m:note_off(a, nil, 1)
+  end
+  active_notes = {}
+end
 
 
 local function midicps(m)
@@ -75,16 +87,23 @@ end
 
 
 local function update_cycle(x, stage)
+  all_notes_off()
+  --print(params:get("output"))
   ---set led.po
   local h = cycles[x].height
   local a = (stage-1) % (16-2*h) + 1
   cycles[x].led_pos = (a <= (9-h) and 1 or 0) * (a + h - 1) + (a > (9-h) and 1 or 0) * (17 - a - h)
+  
   local on = cycles[x].led_pos == 8
   if on and math.random(100) <= params:get("probability") then
     if params:get("output") == 1 then
       engine.start(x, midicps(notes[x] + params:get("transpose")))
     elseif params:get("output") == 2 then
       crow.ii.jf.play_note(((notes[x] + params:get("transpose")) - 60) / 12, 5)
+     -- MIDI out
+    elseif params:get("output") == 3 then
+        m:note_on(notes[x] + params:get("transpose"), 96, 1)
+        table.insert(active_notes, notes[x])
     end
   else
     engine.stop(x)
@@ -115,6 +134,7 @@ local function stop_cycle(x)
     end
   end
   engine.stop(x)
+  all_notes_off()
 end
 
 
