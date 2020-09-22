@@ -25,6 +25,7 @@
 -- originally by declutter
 --
 -- updated for 2.0 by justmat
+-- llllllll.co/t/26536
 
 engine.name = 'PolySub'
 
@@ -36,7 +37,7 @@ function g.event(x,y,z) gridkey(x,y,z) end
 
 local active_notes = {}
 
-local GRID_HEIGHT = 16
+local GRID_HEIGHT = 8
 local DURATION_1 = 1 / 20
 local GRID_FRAMERATE = 1 / 60
 local SCREEN_FRAMERATE = 1 / 30
@@ -88,13 +89,12 @@ end
 
 local function update_cycle(x, stage)
   all_notes_off()
-  --print(params:get("output"))
   ---set led.po
   local h = cycles[x].height
   local a = (stage-1) % (16-2*h) + 1
   cycles[x].led_pos = (a <= (9-h) and 1 or 0) * (a + h - 1) + (a > (9-h) and 1 or 0) * (17 - a - h)
   
-  local on = cycles[x].led_pos == 8
+  local on = cycles[x].led_pos == GRID_HEIGHT
   if on and math.random(100) <= params:get("probability") then
     if params:get("output") == 1 then
       engine.start(x, midicps(notes[x] + params:get("transpose")))
