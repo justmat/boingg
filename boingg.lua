@@ -244,7 +244,7 @@ end
 
 function enc(n, d)
   if n == 1 then
-    mix:delta("output", d)
+    params:delta("output_level", d)
     redraw()
   elseif n == 2 then
     current_cycle = util.clamp(current_cycle + d, 1, 16)
