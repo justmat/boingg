@@ -77,7 +77,7 @@ end
 
 
 local function set_output()
-  if params:get("output") == 2 then
+  if params:get("outs") == 2 then
     crow.ii.pullup(true)
     crow.ii.jf.mode(1)
   else
