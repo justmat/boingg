@@ -144,8 +144,8 @@ function init()
     cycles[i] = { running = false, keys_pressed = 0, speed = 1, led_pos = 0, height = 0}
   end
 
-  params:add_option("output", "output", output_options, 1)
-  params:set_action("output", function() set_output() end)
+  params:add_option("outs", "outs", output_options, 1)
+  params:set_action("outs", function() set_output() end)
 
   params:add_number("tempo", "tempo", 10, 240, 40)
   params:set_action("tempo", function(t)
