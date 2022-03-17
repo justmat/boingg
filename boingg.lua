@@ -96,12 +96,12 @@ local function update_cycle(x, stage)
   
   local on = cycles[x].led_pos == GRID_HEIGHT
   if on and math.random(100) <= params:get("probability") then
-    if params:get("output") == 1 then
+    if params:get("outs") == 1 then
       engine.start(x, midicps(notes[x] + params:get("transpose")))
-    elseif params:get("output") == 2 then
+    elseif params:get("outs") == 2 then
       crow.ii.jf.play_note(((notes[x] + params:get("transpose")) - 60) / 12, 5)
      -- MIDI out
-    elseif params:get("output") == 3 then
+    elseif params:get("outs") == 3 then
         m:note_on(notes[x] + params:get("transpose"), 96, 1)
         table.insert(active_notes, notes[x])
     end
