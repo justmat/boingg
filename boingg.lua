@@ -32,6 +32,8 @@ engine.name = 'PolySub'
 local m = midi.connect(1)
 m.event = function() end
 
+mu = require "musicutil"
+
 local g = grid.connect(1)
 function g.event(x,y,z) gridkey(x,y,z) end
 
@@ -271,7 +273,8 @@ function redraw()
   screen.clear()
   screen.aa(0)
   screen.line_width(1)
-
+  screen.font_face(25)
+  screen.font_size(6)
   screen.level(1)
   screen.move(0, 48)
   screen.line(128,48)
@@ -299,6 +302,14 @@ function redraw()
       screen.circle(x+2,y+(cycles[i].led_pos) * 4 - 32,2)
       screen.fill()
     end
+  end
+
+  for i = 1, 16 do
+    local x = (i-1) * 8
+    local y = 60
+    
+    screen.move(x, y)
+    screen.text(mu.note_num_to_name(mu.freq_to_note_num(midicps(notes[i]))))
   end
 
   screen.update()
